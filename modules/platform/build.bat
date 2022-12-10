@@ -8,7 +8,7 @@ call :add_source source\lib.cpp
 
 set "EXTRA_OPTIONS="
 if "%~1" == "debug" (
-	call :add_extra_option /Zi
+  call :add_extra_option /Zi
 )
 
 mkdir build 2> NUL
@@ -27,9 +27,9 @@ goto :eof
 :add_source
 set "ABS_PATH="%~dp0%~1""
 if defined SOURCES (
-	set "SOURCES=%SOURCES% %ABS_PATH%"
+  set "SOURCES=%SOURCES% %ABS_PATH%"
 ) else (
-	set "SOURCES=%ABS_PATH%"
+  set "SOURCES=%ABS_PATH%"
 )
 
 set "ABS_PATH="
@@ -38,9 +38,9 @@ exit /b 0
 :add_extra_option
 set "OPTION=%~1"
 if defined EXTRA_OPTIONS (
-	set "EXTRA_OPTIONS=%EXTRA_OPTIONS% %OPTION%"
+  set "EXTRA_OPTIONS=%EXTRA_OPTIONS% %OPTION%"
 ) else (
-	set "EXTRA_OPTIONS=%OPTION%"
+  set "EXTRA_OPTIONS=%OPTION%"
 )
 
 set "OPTION="
