@@ -11,6 +11,6 @@ mkdir build\playground 2>NUL
 pushd build
 cl^
  /nologo /W4 /WX /Fo"playground\\"^
- /I"..\include" "%~dp0source\main.cpp" platform.lib^
+ /I"..\include" "%~dp0src\main.cpp" platform.lib^
  /Fe"playground.exe" /link /NOLOGO
 popd
