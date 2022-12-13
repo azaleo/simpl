@@ -55,7 +55,6 @@ if not defined %VAR_NAME% (
 ) else (
   set "%VAR_NAME%=%%VAR_NAME%% %2"
 )
-
 set "VAR_NAME="
 exit /b 0
 
