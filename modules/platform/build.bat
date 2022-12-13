@@ -49,11 +49,14 @@ set "COMPILER_OPTIONS="
 goto :eof
 
 :add_to
-if not defined %1 (
-  set "%1=%2"
+set "VAR_NAME=%1"
+if not defined %VAR_NAME% (
+  set "%VAR_NAME%=%2"
 ) else (
-  set "%1=%%1% %2"
+  set "%VAR_NAME%=%%VAR_NAME%% %2"
 )
+
+set "VAR_NAME="
 exit /b 0
 
 :add_source_to
