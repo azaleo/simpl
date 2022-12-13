@@ -3,7 +3,6 @@
 rem This script should not be used directly, please use "build_playground.bat"
 rem in the source root instead.
 
-echo:
 echo playground
 
 mkdir build 2>NUL

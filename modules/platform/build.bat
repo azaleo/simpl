@@ -4,14 +4,9 @@ rem This script should not be used directly, please use "build_platform.bat"
 rem in the source root instead.
 
 set "SOURCES="
-for /f %%i in (%~dp0\sources.txt) do (
-  call :add_source_to SOURCES %%i
-)
-
 set "TEST_SOURCES="
-for /f %%i in (%~dp0\test_sources.txt) do (
-  call :add_source_to TEST_SOURCES %%i
-)
+for /f %%i in (%~dp0\sources.txt) do call :add_source_to SOURCES %%i
+for /f %%i in (%~dp0\test_sources.txt) do call :add_source_to TEST_SOURCES %%i
 
 rem For now compiler options are used for both lib and tests.
 set "COMPILER_OPTIONS="
@@ -19,7 +14,6 @@ if "%~1" == "debug" (
   call :add_to COMPILER_OPTIONS /Zi
 )
 
-echo:
 echo platform
 
 mkdir build 2>NUL
@@ -33,7 +27,7 @@ cl^
 popd
 
 echo:
-echo platform tests
+echo platform\tests
 
 mkdir build\platform\tests 2>NUL
 pushd build\platform
