@@ -4,44 +4,54 @@ rem This script should not be used directly, please use "build_platform.bat"
 rem in the source root instead.
 
 set "SOURCES="
-call :add_source source\lib.cpp
+call :add_source_to SOURCES source\lib.cpp
 
-set "EXTRA_OPTIONS="
+set "TEST_SOURCES="
+call :add_source_to TEST_SOURCES tests\main.cpp
+
+rem For now compiler options are used for both lib and tests.
+set "COMPILER_OPTIONS="
 if "%~1" == "debug" (
-  call :add_extra_option /Zi
+  call :add_to COMPILER_OPTIONS /Zi
 )
 
-mkdir build 2> NUL
-mkdir build\platform 2> NUL
+echo:
+echo platform
+
+mkdir build 2>NUL
+mkdir build\platform 2>NUL
 pushd build
 cl^
- /W4 /WX /Fo"platform\\" %EXTRA_OPTIONS%^
+ /nologo /W4 /WX /Fo"platform\\" %COMPILER_OPTIONS%^
  /I"..\include" /c %SOURCES%^
- && lib /WX "platform\*.obj" /OUT:simpl_platform.lib
+ && lib /NOLOGO /WX "platform\*.obj"^
+ /OUT:platform.lib
+popd
+
+echo:
+echo platform tests
+
+mkdir build\platform\tests 2>NUL
+pushd build\platform
+cl^
+ /nologo /W4 /WX /Fo"tests\\" %COMPILER_OPTIONS%^
+ /I"..\..\include" %TEST_SOURCES% ..\platform.lib^
+ /Fe"tests.exe" /link /NOLOGO
 popd
 
 set "SOURCES="
-set "EXTRA_OPTIONS="
+set "TEST_SOURCES="
+set "COMPILER_OPTIONS="
 goto :eof
 
-:add_source
-set "ABS_PATH="%~dp0%~1""
-if defined SOURCES (
-  set "SOURCES=%SOURCES% %ABS_PATH%"
+:add_to
+if not defined %1 (
+  set "%1=%2"
 ) else (
-  set "SOURCES=%ABS_PATH%"
+  set "%1=%%1% %2"
 )
-
-set "ABS_PATH="
 exit /b 0
 
-:add_extra_option
-set "OPTION=%~1"
-if defined EXTRA_OPTIONS (
-  set "EXTRA_OPTIONS=%EXTRA_OPTIONS% %OPTION%"
-) else (
-  set "EXTRA_OPTIONS=%OPTION%"
-)
-
-set "OPTION="
+:add_source_to
+call :add_to %1 "%~dp0%~2"
 exit /b 0
