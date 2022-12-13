@@ -4,10 +4,14 @@ rem This script should not be used directly, please use "build_platform.bat"
 rem in the source root instead.
 
 set "SOURCES="
-call :add_source_to SOURCES source\lib.cpp
+for /f %%i in (%~dp0\sources.txt) do (
+  call :add_source_to SOURCES %%i
+)
 
 set "TEST_SOURCES="
-call :add_source_to TEST_SOURCES tests\main.cpp
+for /f %%i in (%~dp0\test_sources.txt) do (
+  call :add_source_to TEST_SOURCES %%i
+)
 
 rem For now compiler options are used for both lib and tests.
 set "COMPILER_OPTIONS="
