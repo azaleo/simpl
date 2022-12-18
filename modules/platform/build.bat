@@ -1,6 +1,6 @@
 @echo off
 
-rem This script should not be used directly, please use "build_platform.bat"
+rem This script should not be used directly, please use "build-platform.bat"
 rem in the source root instead.
 
 set "sources="
