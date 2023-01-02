@@ -6,10 +6,16 @@
 
 namespace sim {
   struct vec3 {
-    f64 e[3];
+    f64 e[3] = {};
     
-    vec3() : e{0.0, 0.0, 0.0} {}
-    vec3(f64 x, f64 y, f64 z) : e{x, y, z} {}
+    static vec3 zero() { return {}; }
+    static vec3 make(f64 e0, f64 e1, f64 e2) {
+      vec3 v;
+      v.e[0] = e0;
+      v.e[1] = e1;
+      v.e[2] = e2;
+      return v;
+    }
     
     f64 x() const { return e[0]; }
     f64 y() const { return e[1]; }
@@ -57,7 +63,7 @@ namespace sim {
   };
   
   typedef vec3 point3;
-  typedef vec3 rgb_color;
+  typedef vec3 rgb;
   
   inline vec3 operator+(const vec3& a, const vec3& b) {
     f64 x = a.x() + b.x();
