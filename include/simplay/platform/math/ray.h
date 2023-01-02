@@ -1,21 +1,22 @@
 #pragma once
 
-#include "vec3.h"
 #include "simplay/platform/core.h"
+
+#include "vec3.h"
 
 namespace sim {
   struct Ray {
-    point3 origin;
-    vec3 dir;
+    Point3 origin;
+    Vec3 dir;
     
-    static Ray make(const point3& origin, const vec3& dir) {
+    static Ray make(const Point3& origin, const Vec3& dir) {
       Ray r;
       r.origin = origin;
       r.dir = dir;
       return r;
     }
     
-    point3 at(f64 t) {
+    Point3 at(f64 t) const {
       return origin + t*dir;
     }
   };
