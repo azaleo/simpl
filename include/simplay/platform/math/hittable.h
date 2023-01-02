@@ -32,7 +32,7 @@ namespace sim {
     
     Hittable() {}
     
-    static Hittable make_sphere(Point3 center, f64 radius) {
+    static Hittable make_sphere(const Point3& center, f64 radius) {
       Hittable h;
       h.type = SPHERE;
       h.sphere.center = center;

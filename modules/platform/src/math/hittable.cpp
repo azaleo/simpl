@@ -4,12 +4,10 @@ namespace sim {
   bool Hittable::hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) {
     switch (type) {
       case NONE:
-      default: {
+      default:
         return false;
-      }
-      case SPHERE: {
+      case SPHERE:
         return sphere.hit(r, tmin, tmax, hr);
-      }
     }
   }
   

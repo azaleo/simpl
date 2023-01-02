@@ -1,4 +1,3 @@
-#include <math.h>
 #include <stdio.h>
 
 #include <simplay/platform/core.h>
@@ -57,5 +56,5 @@ int main() {
       write_color3(stdout, ray_color(r));
     }
   }
-  fprintf(stderr, "\nDone\n");
+  fprintf(stderr, "\n");
 }
