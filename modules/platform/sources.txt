@@ -1,1 +1,2 @@
-src/lib.cpp
+src/core.cpp
+src/math/color-io.cpp

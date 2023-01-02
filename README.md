@@ -1,3 +1,3 @@
-# simpl
+# simplay
 
-SIMulation PLayground.
+SIMulation PLAYground.

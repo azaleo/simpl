@@ -19,4 +19,6 @@ cl^
  /Fe"playground.exe" /link /NOLOGO
 popd
 
+set "sources="
 set "compiler_options="
+goto :eof

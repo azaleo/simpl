@@ -42,8 +42,11 @@ set "test_sources="
 set "compiler_options="
 goto :eof
 
+rem Slashes in the source path are normalized into backslashes
 :add_source_to
-call :add_to %1 "%~dp0%~2"
+set "source=%~dp0%~2"
+call :add_to %1 "%source:/=\%"
+set "source="
 exit /b 0
 
 :add_to
@@ -51,7 +54,7 @@ set "var_name=%1"
 if not defined %var_name% (
   set "%var_name%=%2"
 ) else (
-  set "%var_name%=%%var_name%% %2"
+  call set "%var_name%=%%%var_name%%% %2"
 )
 set "var_name="
 exit /b 0
