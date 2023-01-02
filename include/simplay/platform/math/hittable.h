@@ -7,14 +7,19 @@
 
 namespace sim {
   struct HitRecord {
-    f64 t = 0.0;
+    f64 t;
     Point3 p;
     Vec3 normal;
+
+    HitRecord() : t(0.0), p(), normal() {}
   };
   
   struct Sphere {
     Point3 center;
-    f64 radius = 0.0;
+    f64 radius;
+
+    Sphere() : center(), radius(0.0) {}
+    Sphere(const Point3& center, f64 radius) : center(center), radius(radius) {}
     
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr);
   };
@@ -25,12 +30,12 @@ namespace sim {
       SPHERE,
     };
     
-    Type type = NONE;
+    Type type;
     union {
       Sphere sphere;
     };
     
-    Hittable() {}
+    Hittable() : type(NONE) {}
     
     static Hittable make_sphere(const Point3& center, f64 radius) {
       Hittable h;

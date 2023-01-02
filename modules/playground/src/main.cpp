@@ -11,20 +11,20 @@ namespace sim {
   const i32 IMG_H = (i32)(IMG_W / ASPECT_RATIO);
   
   Color3 ray_color(const Ray& r) {
-    Hittable h = Hittable::make_sphere(Point3::make(0.0, 0.0, -1.0), 0.5);
+    Hittable h = Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5);
     HitRecord hr;
     if (h.hit(r, 0.0, 1000.0, &hr))
-      return 0.5*(hr.normal + Vec3::make(1.0, 1.0, 1.0));
+      return 0.5*(hr.normal + Vec3(1.0, 1.0, 1.0));
     
     Vec3 unit_dir = normalize(r.dir);
-    f64 t = 0.5*(unit_dir.y() + 1.0);
-    return (1.0-t)*Color3::make(1.0, 1.0, 1.0) + t*Color3::make(0.5, 0.7, 1.0);
+    f64 t = 0.5*(unit_dir.y + 1.0);
+    return (1.0-t)*Color3(1.0, 1.0, 1.0) + t*Color3(0.5, 0.7, 1.0);
   }
   
   void write_color3(FILE* out, const Color3& c) {
-    i32 ir = (i32)(255.999 * c.x());
-    i32 ig = (i32)(255.999 * c.y());
-    i32 ib = (i32)(255.999 * c.z());
+    i32 ir = (i32)(255.999 * c.x);
+    i32 ig = (i32)(255.999 * c.y);
+    i32 ib = (i32)(255.999 * c.z);
     fprintf(out, "%d %d %d\n", ir, ig, ib);
   }
 }
@@ -37,10 +37,10 @@ int main() {
   f64 viewport_w = viewport_h * ASPECT_RATIO;
   f64 focal_length = 1.0;
   
-  Point3 origin = Point3::zero();
-  Vec3 horizontal = Vec3::make(viewport_w, 0.0, 0.0);
-  Vec3 vertical = Vec3::make(0.0, viewport_h, 0.0);
-  Point3 lower_left = origin - horizontal/2 - vertical/2 - Vec3::make(0.0, 0.0, focal_length);
+  Point3 origin;
+  Vec3 horizontal(viewport_w, 0.0, 0.0);
+  Vec3 vertical(0.0, viewport_h, 0.0);
+  Point3 lower_left = origin - horizontal/2 - vertical/2 - Vec3(0.0, 0.0, focal_length);
   
   // Render
   printf("P3\n%d %d\n255\n", IMG_W, IMG_H);
@@ -52,7 +52,7 @@ int main() {
       f64 u = (f64)x / (IMG_W-1);
       f64 v = (f64)y / (IMG_H-1);
       
-      Ray r = Ray::make(origin, lower_left + u*horizontal + v*vertical - origin);
+      Ray r(origin, lower_left + u*horizontal + v*vertical - origin);
       write_color3(stdout, ray_color(r));
     }
   }

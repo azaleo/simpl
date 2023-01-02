@@ -9,15 +9,8 @@ namespace sim {
     Point3 origin;
     Vec3 dir;
     
-    static Ray make(const Point3& origin, const Vec3& dir) {
-      Ray r;
-      r.origin = origin;
-      r.dir = dir;
-      return r;
-    }
+    Ray(const Point3& origin, const Vec3& dir) : origin(origin), dir(dir) {}
     
-    Point3 at(f64 t) const {
-      return origin + t*dir;
-    }
+    Point3 at(f64 t) const { return origin + t*dir; }
   };
 }
