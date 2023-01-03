@@ -35,17 +35,17 @@ namespace sim {
   bool Dielectric::scatter(const Ray& in, const HitRecord& hr, Color3* attenuation, Ray* scattered) const {
     if (scattered) {
       f64 idx_ratio = hr.front_face ? (1.0/ior) : ior;
-      Vec3 ray_dir = normalize(in.dir);
       
+      Vec3 ray_dir = normalize(in.dir);
       f64 cos_theta = min(dot(-ray_dir, hr.normal), 1.0);
       f64 sin_theta = sqrt(1.0 - cos_theta*cos_theta);
+
+      // Total internal reflection.
       bool should_reflect = (idx_ratio*sin_theta > 1.0);
-      if (should_reflect || (schlick_reflectance(cos_theta, idx_ratio) > random_f64())) {
-        // Total internal reflection.
+      if (should_reflect || (schlick_reflectance(cos_theta, idx_ratio) > random_f64()))
         *scattered = Ray(hr.p, reflect(ray_dir, hr.normal));
-      } else {
+      else
         *scattered = Ray(hr.p, refract(ray_dir, hr.normal, idx_ratio));
-      }
     }
     if (attenuation)
       *attenuation = Color3(1.0, 1.0, 1.0);
