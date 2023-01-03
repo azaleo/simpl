@@ -42,7 +42,7 @@ set "test_sources="
 set "compiler_options="
 goto :eof
 
-rem Slashes in the source path are normalized into backslashes
+rem Slashes in the source path are normalized into backslashes.
 :add_source_to
 set "source=%~dp0%~2"
 call :add_to %1 "%source:/=\%"
