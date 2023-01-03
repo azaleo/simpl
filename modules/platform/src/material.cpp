@@ -27,7 +27,7 @@ namespace sim {
     switch (type) {
       case NONE:
       default:
-        return get_default()->scatter(in, hr, attenuation, scattered);
+        return false;
       case LAMBERTIAN:
         return lambertian.scatter(in, hr, attenuation, scattered);
       case METAL:
