@@ -39,8 +39,8 @@ namespace sim {
     if (delta < 0.0)
       return false;
     
-    // Find root within [tmin, tmax]
-    f64 sqrtd = ::sqrt(delta);
+    // Find root within [tmin, tmax].
+    f64 sqrtd = sqrt(delta);
     f64 root = (-half_b - sqrtd) / a;
     if (root < tmin || tmax < root) {
       root = (-half_b + sqrtd) / a;

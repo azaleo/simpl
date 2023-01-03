@@ -14,7 +14,7 @@ namespace sim {
 
     Vector() : data(nullptr), length(0), capacity(0) {}
 
-    // Unchecked bounds for now
+    // Unchecked bounds for now.
     T& operator[](usize i) { return data[i]; }
     const T& operator[](usize i) const { return data[i]; }
 

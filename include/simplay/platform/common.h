@@ -45,7 +45,7 @@ namespace sim {
       if (p.sqmag() < 1.0)
         return p;
     }
-    // Unreachable
+    // Unreachable.
     return Vec3(0.0, 0.0, 0.0);
   }
 

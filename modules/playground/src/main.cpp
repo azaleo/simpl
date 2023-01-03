@@ -28,41 +28,39 @@ namespace sim {
   }
   
   void write_color3(FILE* out, const Color3& c) {
-    // sqrt <=> gamma=2.0
+    // sqrt <=> gamma=2.0.
     i32 ir = (i32)(256.0 * clamp(sqrt(c.x), 0.0, 0.999));
     i32 ig = (i32)(256.0 * clamp(sqrt(c.y), 0.0, 0.999));
     i32 ib = (i32)(256.0 * clamp(sqrt(c.z), 0.0, 0.999));
     fprintf(out, "%d %d %d\n", ir, ig, ib);
+  }
+
+  void render(const Camera& camera, const Hittable& world) {
+    printf("P3\n%d %d\n255\n", IMG_W, IMG_H);
+    for (i32 y = IMG_H-1; y > 0; --y) {
+      fprintf(stderr, "\rRendering %.2f%%", (f64)(IMG_H-y) / (IMG_H-1) * 100.0);
+      fflush(stderr);
+      for (i32 x = 0; x < IMG_W; ++x) {
+        Color3 pixel(0.0, 0.0, 0.0);
+        for (i32 i = 0; i < PIXEL_SAMPLES; ++i) {
+          f64 u = ((f64)x + random_f64()) / (IMG_W-1);
+          f64 v = ((f64)y + random_f64()) / (IMG_H-1);
+          pixel += ray_color(camera.cast_ray(u, v), world, MAX_DEPTH);
+        }
+        pixel /= PIXEL_SAMPLES;
+        write_color3(stdout, pixel);
+      }
+    }
+    fprintf(stderr, "\n");
   }
 }
 
 int main() {
   using namespace sim;
 
-  // Scene
+  Camera camera;
   Hittable world = Hittable::make_scene();
   world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5));
   world.scene.push(Hittable::make_sphere(Point3(0.0, -100.5, -1.0), 100.0));
-  
-  // Camera
-  Camera camera;
-  
-  // Render
-  printf("P3\n%d %d\n255\n", IMG_W, IMG_H);
-  for (i32 y = IMG_H-1; y > 0; --y) {
-    fprintf(stderr, "\rRendering %.2f%%", (f64)(IMG_H-y) / (IMG_H-1) * 100.0);
-    fflush(stderr);
-    
-    for (i32 x = 0; x < IMG_W; ++x) {
-      Color3 pixel(0.0, 0.0, 0.0);
-      for (i32 i = 0; i < PIXEL_SAMPLES; ++i) {
-        f64 u = ((f64)x + random_f64()) / (IMG_W-1);
-        f64 v = ((f64)y + random_f64()) / (IMG_H-1);
-        pixel += ray_color(camera.cast_ray(u, v), world, MAX_DEPTH);
-      }
-      pixel /= PIXEL_SAMPLES;
-      write_color3(stdout, pixel);
-    }
-  }
-  fprintf(stderr, "\n");
+  render(camera, world);
 }
