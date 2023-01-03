@@ -1,4 +1,4 @@
-#include "simplay/platform/math/hittable.h"
+#include "simplay/platform/hittable.h"
 
 namespace sim {
   namespace {

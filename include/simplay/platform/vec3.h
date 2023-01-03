@@ -46,7 +46,7 @@ namespace sim {
     }
     
     f64 mag() const {
-      return ::sqrt(sqmag());
+      return sqrt(sqmag());
     }
     
     f64 sqmag() const {
