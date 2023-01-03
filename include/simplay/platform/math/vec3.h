@@ -6,11 +6,11 @@
 
 namespace sim {
   struct Vec3 {
-    f64 x = 0.0;
-    f64 y = 0.0;
-    f64 z = 0.0;
+    f64 x;
+    f64 y;
+    f64 z;
     
-    Vec3() = default;
+    Vec3() : x(0.0), y(0.0), z(0.0) {}
     Vec3(f64 x, f64 y, f64 z) : x(x), y(y), z(z) {}
     
     f64& operator[](usize i) { return (&x)[i]; }
