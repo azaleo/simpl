@@ -1,7 +1,6 @@
 #pragma once
 
-#include "simplay/platform/core.h"
-
+#include "core.h"
 #include "vec3.h"
 
 namespace sim {

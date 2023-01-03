@@ -1,10 +1,9 @@
 #pragma once
 
-#include "simplay/platform/core.h"
-#include "simplay/platform/vector.h"
-
+#include "core.h"
 #include "ray.h"
 #include "vec3.h"
+#include "vector.h"
 
 namespace sim {
   struct Material;
@@ -30,8 +29,8 @@ namespace sim {
     Material* mat;
 
     Sphere() : center(), radius(0.0), mat(nullptr) {}
-    Sphere(const Point3& center, f64 radius)
-      : center(center), radius(radius), mat(nullptr) {}
+    Sphere(const Point3& center, f64 radius, Material* mat = nullptr)
+      : center(center), radius(radius), mat(mat) {}
     
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) const;
   };
@@ -51,10 +50,10 @@ namespace sim {
     
     Hittable() : type(NONE) {}
     
-    static Hittable make_sphere(const Point3& center, f64 radius) {
+    static Hittable make_sphere(const Point3& center, f64 radius, Material* mat = nullptr) {
       Hittable h;
       h.type = SPHERE;
-      h.sphere = Sphere(center, radius);
+      h.sphere = Sphere(center, radius, mat);
       return h;
     }
 

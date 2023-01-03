@@ -2,7 +2,8 @@
 
 #include <math.h>
 
-#include "simplay/platform/core.h"
+#include "common.h"
+#include "core.h"
 
 namespace sim {
   struct Vec3 {
@@ -115,5 +116,12 @@ namespace sim {
 
   inline Vec3 reflect(const Vec3& v, const Vec3& n) {
     return v - 2.0*dot(v, n)*n;
+  }
+
+  inline Vec3 refract(const Vec3& v, const Vec3& n, f64 idx_ratio) {
+    f64 cos_theta = min(dot(-v, n), 1.0);
+    Vec3 out_perp = idx_ratio * (v + cos_theta*n);
+    Vec3 out_parallel = -sqrt(fabs(1.0 - out_perp.sqmag())) * n;
+    return out_perp + out_parallel;
   }
 }

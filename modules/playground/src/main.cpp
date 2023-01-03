@@ -5,6 +5,7 @@
 #include <simplay/platform/core.h>
 #include <simplay/platform/hittable.h>
 #include <simplay/platform/material.h>
+#include <simplay/platform/random.h>
 
 namespace sim {
   const f64 ASPECT_RATIO = 16.0 / 9.0;
@@ -65,19 +66,17 @@ int main() {
   using namespace sim;
   
   Material ground_mat = Material::make_lambertian(Color3(0.8, 0.8, 0.0));
-  Material center_mat = Material::make_lambertian(Color3(0.7, 0.3, 0.3));
-  Material left_mat = Material::make_metal(Color3(0.8, 0.8, 0.8), 0.3);
-  Material right_mat = Material::make_metal(Color3(0.8, 0.6, 0.2), 1.0);
+  Material center_mat = Material::make_lambertian(Color3(0.1, 0.2, 0.5));
+  Material left_mat = Material::make_dielectric(1.5);
+  Material right_mat = Material::make_metal(Color3(0.8, 0.6, 0.2), 0.0);
   
   Hittable world = Hittable::make_scene();
-  world.scene.push(Hittable::make_sphere(Point3(0.0, -100.5, -1.0), 100.0));
-  world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5));
-  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), 0.5));
-  world.scene.push(Hittable::make_sphere(Point3(1.0, 0.0, -1.0), 0.5));
-  world.scene[0].sphere.mat = &ground_mat;
-  world.scene[1].sphere.mat = &center_mat;
-  world.scene[2].sphere.mat = &left_mat;
-  world.scene[3].sphere.mat = &right_mat;
+  world.scene.push(Hittable::make_sphere(Point3(0.0, -100.5, -1.0), 100.0, &ground_mat));
+  world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5, &center_mat));
+  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), 0.5, &left_mat));
+  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), -0.45, &left_mat));
+  world.scene.push(Hittable::make_sphere(Point3(1.0, 0.0, -1.0), 0.5, &right_mat));
 
   render(Camera(), world);
+  world.scene.release();
 }

@@ -23,17 +23,27 @@ namespace sim {
     bool scatter(const Ray& in, const HitRecord& hr, Color3* attenuation, Ray* scattered) const;
   };
 
+  struct Dielectric {
+    f64 ior;
+
+    Dielectric(f64 ior) : ior(ior) {}
+
+    bool scatter(const Ray& in, const HitRecord& hr, Color3* attenuation, Ray* scattered) const;
+  };
+
   struct Material {
     enum Type {
       NONE,
       LAMBERTIAN,
       METAL,
+      DIELECTRIC,
     };
 
     Type type;
     union {
       Lambertian lambertian;
       Metal metal;
+      Dielectric dielectric;
     };
 
     Material() : type(NONE) {}
@@ -54,6 +64,13 @@ namespace sim {
       Material m;
       m.type = METAL;
       m.metal = Metal(albedo, fuzz);
+      return m;
+    }
+
+    static Material make_dielectric(f64 ior) {
+      Material m;
+      m.type = DIELECTRIC;
+      m.dielectric = Dielectric(ior);
       return m;
     }
 
