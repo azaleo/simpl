@@ -11,6 +11,8 @@ namespace sim {
     
     Ray(const Point3& origin, const Vec3& dir) : origin(origin), dir(dir) {}
     
-    Point3 at(f64 t) const { return origin + t*dir; }
+    Point3 at(f64 t) const {
+      return origin + t*dir;
+    }
   };
 }
