@@ -7,13 +7,16 @@
 #include "vec3.h"
 
 namespace sim {
+  struct Material;
+
   struct HitRecord {
     Point3 p;
     f64 t;
     Vec3 normal;
     bool front_face;
+    Material* mat;
 
-    HitRecord() : p(), t(0.0), normal(), front_face(false) {}
+    HitRecord() : p(), t(0.0), normal(), front_face(false), mat(nullptr) {}
 
     void set_normal(const Ray& r, const Vec3& surface_normal) {
       front_face = (dot(r.dir, surface_normal) < 0);
@@ -24,9 +27,11 @@ namespace sim {
   struct Sphere {
     Point3 center;
     f64 radius;
+    Material* mat;
 
-    Sphere() : center(), radius(0.0) {}
-    Sphere(const Point3& center, f64 radius) : center(center), radius(radius) {}
+    Sphere() : center(), radius(0.0), mat(nullptr) {}
+    Sphere(const Point3& center, f64 radius)
+      : center(center), radius(radius), mat(nullptr) {}
     
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) const;
   };

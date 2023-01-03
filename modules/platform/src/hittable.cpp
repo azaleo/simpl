@@ -24,6 +24,7 @@ namespace sim {
       hr->t = root;
       hr->p = r.at(hr->t);
       hr->set_normal(r, (hr->p - center) / radius);
+      hr->mat = mat;
     }
     return true;
   }
@@ -33,11 +34,11 @@ namespace sim {
       bool hit_anything = false;
       f64 closest = tmax;
       for (usize i = 0; i < scene.length; ++i) {
-        HitRecord rec;
-        if (scene[i].hit(r, tmin, closest, &rec)) {
+        HitRecord current;
+        if (scene[i].hit(r, tmin, closest, &current)) {
           hit_anything = true;
-          closest = rec.t;
-          *hr = rec;
+          closest = current.t;
+          *hr = current;
         }
       }
       return hit_anything;

@@ -45,6 +45,7 @@ namespace sim {
       capacity = 0;
     }
 
+    // Returns a reference to the element that was just added.
     void push(const T& t) {
       if (length == capacity)
         reserve(capacity * 2 + 1);

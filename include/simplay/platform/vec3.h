@@ -52,6 +52,11 @@ namespace sim {
     f64 sqmag() const {
       return x*x + y*y + z*z;
     }
+
+    bool is_near_zero() const {
+      const f64 epsilon = 1e-8;
+      return (fabs(x) < epsilon) && (fabs(y) < epsilon) && (fabs(y) < epsilon);
+    }
   };
   
   typedef Vec3 Point3;
@@ -68,6 +73,13 @@ namespace sim {
     f64 x = a.x - b.x;
     f64 y = a.y - b.y;
     f64 z = a.z - b.z;
+    return Vec3(x, y, z);
+  }
+
+  inline Vec3 operator*(const Vec3& a, const Vec3& b) {
+    f64 x = a.x * b.x;
+    f64 y = a.y * b.y;
+    f64 z = a.z * b.z;
     return Vec3(x, y, z);
   }
   
@@ -99,5 +111,9 @@ namespace sim {
   
   inline Vec3 normalize(const Vec3& v) {
     return v / v.mag();
+  }
+
+  inline Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return v - 2.0*dot(v, n)*n;
   }
 }

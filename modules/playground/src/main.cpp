@@ -4,6 +4,7 @@
 #include <simplay/platform/common.h>
 #include <simplay/platform/core.h>
 #include <simplay/platform/hittable.h>
+#include <simplay/platform/material.h>
 
 namespace sim {
   const f64 ASPECT_RATIO = 16.0 / 9.0;
@@ -17,14 +18,19 @@ namespace sim {
       return Color3(0.0, 0.0, 0.0);
     
     HitRecord hr;
-    if (world.hit(r, 0.001, F64_INF, &hr)) {
-      Point3 target = hr.p + random_vec3_in_hemisphere(hr.normal);
-      return 0.5 * ray_color(Ray(hr.p, target - hr.p), world, depth-1);
+    if (!world.hit(r, 0.001, F64_INF, &hr)) {
+      // If no hit, return a background sky gradient.
+      Vec3 unit_dir = normalize(r.dir);
+      f64 t = 0.5 * (unit_dir.y + 1.0);
+      return (1.0-t)*Color3(1.0, 1.0, 1.0) + t*Color3(0.5, 0.7, 1.0);
     }
-    
-    Vec3 unit_dir = normalize(r.dir);
-    f64 t = 0.5 * (unit_dir.y + 1.0);
-    return (1.0-t)*Color3(1.0, 1.0, 1.0) + t*Color3(0.5, 0.7, 1.0);
+
+    Material* mat = hr.mat ? hr.mat : Material::get_default();
+    Ray scattered;
+    Color3 attenuation;
+    if (!mat->scatter(r, hr, &attenuation, &scattered))
+      return Color3(0.0, 0.0, 0.0);
+    return attenuation * ray_color(scattered, world, depth-1);
   }
   
   void write_color3(FILE* out, const Color3& c) {
@@ -57,10 +63,21 @@ namespace sim {
 
 int main() {
   using namespace sim;
-
-  Camera camera;
+  
+  Material ground_mat = Material::make_lambertian(Color3(0.8, 0.8, 0.0));
+  Material center_mat = Material::make_lambertian(Color3(0.7, 0.3, 0.3));
+  Material left_mat = Material::make_metal(Color3(0.8, 0.8, 0.8), 0.3);
+  Material right_mat = Material::make_metal(Color3(0.8, 0.6, 0.2), 1.0);
+  
   Hittable world = Hittable::make_scene();
-  world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5));
   world.scene.push(Hittable::make_sphere(Point3(0.0, -100.5, -1.0), 100.0));
-  render(camera, world);
+  world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5));
+  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), 0.5));
+  world.scene.push(Hittable::make_sphere(Point3(1.0, 0.0, -1.0), 0.5));
+  world.scene[0].sphere.mat = &ground_mat;
+  world.scene[1].sphere.mat = &center_mat;
+  world.scene[2].sphere.mat = &left_mat;
+  world.scene[3].sphere.mat = &right_mat;
+
+  render(Camera(), world);
 }

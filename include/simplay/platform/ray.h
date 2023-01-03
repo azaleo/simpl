@@ -9,6 +9,7 @@ namespace sim {
     Point3 origin;
     Vec3 dir;
     
+    Ray() : origin(), dir() {}
     Ray(const Point3& origin, const Vec3& dir) : origin(origin), dir(dir) {}
     
     Point3 at(f64 t) const {
