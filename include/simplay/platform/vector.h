@@ -16,7 +16,9 @@ namespace sim {
 
     // Unchecked bounds for now.
     T& operator[](usize i) { return data[i]; }
+    T& back() { return data[length - 1]; }
     const T& operator[](usize i) const { return data[i]; }
+    const T& back() const { return data[length - 1]; }
 
     void reserve(usize new_capacity) {
       if (new_capacity <= capacity)

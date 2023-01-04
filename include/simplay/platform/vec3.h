@@ -7,9 +7,7 @@
 
 namespace sim {
   struct Vec3 {
-    f64 x;
-    f64 y;
-    f64 z;
+    f64 x, y, z;
     
     Vec3() : x(0.0), y(0.0), z(0.0) {}
     Vec3(f64 x, f64 y, f64 z) : x(x), y(y), z(z) {}

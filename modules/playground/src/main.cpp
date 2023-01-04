@@ -10,11 +10,89 @@
 #include <simplay/platform/vec3.h>
 
 namespace sim {
-  const f64 ASPECT_RATIO = 16.0 / 9.0;
-  const i32 IMG_W = 400;
+  struct SceneMaterials {
+    Material ground;
+    Vector<Material> spheres;
+    Material big1;
+    Material big2;
+    Material big3;
+  };
+
+  struct Scene {
+    Hittable objects;
+    SceneMaterials mats;
+
+    void release() {
+      mats.spheres.release();
+      if (objects.type == Hittable::SCENE) {
+        objects.scene.release();
+        objects = Hittable();
+      }
+    }
+  };
+
+  const f64 ASPECT_RATIO = 3.0 / 2.0;
+  const i32 IMG_W = 1200;
   const i32 IMG_H = (i32)(IMG_W / ASPECT_RATIO);
-  const i32 PIXEL_SAMPLES = 100;
-  const i32 MAX_DEPTH = 10;
+  const i32 PIXEL_SAMPLES = 10;
+  const i32 MAX_DEPTH = 50;
+
+  void build_scene(Scene* world) {
+    if (!world)
+      return;
+
+    world->release();
+    world->objects = Hittable::make_scene();
+
+    // Ground.
+    world->mats.ground = Material::make_lambertian(Color3(0.5, 0.5, 0.5));
+    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, -1000.0, 0.0), 1000.0, &world->mats.ground));
+
+    // Small spheres.
+    // We need to pre-allocate to prevent mat pointer invalidation.
+    world->mats.spheres.reserve(22 * 22);
+    for (i32 a = -11; a < 11; ++a) {
+      for (i32 b = -11; b < 11; ++b) {
+        Point3 center((f64)a + 0.9*random_f64(), 0.2, (f64)b + 0.9*random_f64());
+        if ((center - Point3(4.0, 0.2, 0.0)).mag() > 0.9) {
+          Material sphere_mat;
+
+          f64 choose_mat = random_f64();
+          if (choose_mat < 0.8) {
+            Color3 albedo = random_vec3() * random_vec3();
+            sphere_mat = Material::make_lambertian(albedo);
+          } else if (choose_mat < 0.95) {
+            Color3 albedo = random_vec3_in(0.5, 1.0);
+            f64 fuzz = random_f64_in(0.0, 0.5);
+            sphere_mat = Material::make_metal(albedo, fuzz);
+          } else {
+            sphere_mat = Material::make_dielectric(1.5);
+          }
+
+          world->mats.spheres.push(sphere_mat);
+          world->objects.scene.push(Hittable::make_sphere(center, 0.2, &world->mats.spheres.back()));
+        }
+      }
+    }
+
+    // Big spheres.
+    world->mats.big1 = Material::make_dielectric(1.5);
+    world->mats.big2 = Material::make_lambertian(Color3(0.4, 0.2, 0.1));
+    world->mats.big3 = Material::make_metal(Color3(0.7, 0.6, 0.5), 0.0);
+    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, 1.0, 0.0), 1.0, &world->mats.big1));
+    world->objects.scene.push(Hittable::make_sphere(Point3(-4.0, 1.0, 0.0), 1.0, &world->mats.big2));
+    world->objects.scene.push(Hittable::make_sphere(Point3(4.0, 1.0, 0.0), 1.0, &world->mats.big3));
+  }
+
+  Camera make_camera() {
+    Vec3 up(0.0, 1.0, 0.0);
+    Vec3 lookfrom(13.0, 2.0, 3.0);
+    Vec3 lookat(0.0, 0.0, 0.0);
+
+    f64 focus_dist = 10.0;
+    f64 aperture = 0.1;
+    return Camera(lookfrom, lookat, up, 20.0, ASPECT_RATIO, aperture, focus_dist);
+  }
   
   Color3 ray_color(const Ray& r, const Hittable& world, i32 depth) {
     if (depth <= 0)
@@ -66,24 +144,10 @@ namespace sim {
 
 int main() {
   using namespace sim;
-  
-  Material ground_mat = Material::make_lambertian(Color3(0.8, 0.8, 0.0));
-  Material center_mat = Material::make_lambertian(Color3(0.1, 0.2, 0.5));
-  Material left_mat = Material::make_dielectric(1.5);
-  Material right_mat = Material::make_metal(Color3(0.8, 0.6, 0.2), 0.0);
-  
-  Hittable world = Hittable::make_scene();
-  world.scene.push(Hittable::make_sphere(Point3(0.0, -100.5, -1.0), 100.0, &ground_mat));
-  world.scene.push(Hittable::make_sphere(Point3(0.0, 0.0, -1.0), 0.5, &center_mat));
-  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), 0.5, &left_mat));
-  world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), -0.45, &left_mat));
-  world.scene.push(Hittable::make_sphere(Point3(1.0, 0.0, -1.0), 0.5, &right_mat));
 
-  Vec3 lookfrom(-2.0, 2.0, 1.0);
-  Vec3 lookat(0.0, 0.0, -1.0);
-  Vec3 up(0.0, 1.0, 0.0);
-  Camera cam(lookfrom, lookat, up, 20.0, ASPECT_RATIO);
+  Scene world;
+  build_scene(&world);
 
-  render(cam, world);
-  world.scene.release();
+  render(make_camera(), world.objects);
+  world.release();
 }

@@ -46,4 +46,14 @@ namespace sim {
   inline Vec3 random_dir() {
     return normalize(random_vec3_in_unit_sphere());
   }
+
+  inline Vec3 random_vec3_in_unit_disk() {
+    while (true) {
+      Vec3 p(random_f64_in(-1.0, 1.0), random_f64_in(-1.0, 1.0), 0.0);
+      if (p.sqmag() < 1.0)
+        return p;
+    }
+    // Unreachable.
+    return Vec3(0.0, 0.0, 0.0);
+  }
 }

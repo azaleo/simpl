@@ -30,7 +30,7 @@ namespace sim {
 
     Sphere() : center(), radius(0.0), mat(nullptr) {}
     Sphere(const Point3& center, f64 radius, Material* mat = nullptr)
-      : center(center), radius(radius), mat(mat) {}
+        : center(center), radius(radius), mat(mat) {}
     
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) const;
   };
@@ -63,7 +63,7 @@ namespace sim {
       h.scene = Vector<Hittable>();
       return h;
     }
-    
+
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) const;
   };
 }

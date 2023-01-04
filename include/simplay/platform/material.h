@@ -18,7 +18,7 @@ namespace sim {
     f64 fuzz;
 
     explicit Metal(const Color3& albedo, f64 fuzz)
-      : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
+        : albedo(albedo), fuzz(fuzz < 1.0 ? fuzz : 1.0) {}
 
     bool scatter(const Ray& in, const HitRecord& hr, Color3* attenuation, Ray* scattered) const;
   };
