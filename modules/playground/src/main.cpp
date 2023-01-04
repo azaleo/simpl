@@ -24,10 +24,7 @@ namespace sim {
 
     void release() {
       mats.spheres.release();
-      if (objects.type == Hittable::SCENE) {
-        objects.scene.release();
-        objects = Hittable();
-      }
+      objects.release();
     }
   };
 
@@ -35,7 +32,7 @@ namespace sim {
   const i32 IMG_W = 1200;
   const i32 IMG_H = (i32)(IMG_W / ASPECT_RATIO);
   const i32 PIXEL_SAMPLES = 10;
-  const i32 MAX_DEPTH = 50;
+  const i32 MAX_DEPTH = 20;
 
   void build_scene(Scene* world) {
     if (!world)

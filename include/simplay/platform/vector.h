@@ -24,6 +24,7 @@ namespace sim {
       if (new_capacity <= capacity)
         return;
       
+      // We assume allocation always works.
       T* old = data;
       data = (T*)malloc(new_capacity * sizeof(T));
       memcpy(data, old, length * sizeof(T));

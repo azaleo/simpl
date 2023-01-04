@@ -64,6 +64,11 @@ namespace sim {
       return h;
     }
 
+    void release() {
+      if (type == SCENE)
+        scene.release();
+    }
+
     bool hit(const Ray& r, f64 tmin, f64 tmax, HitRecord* hr) const;
   };
 }
