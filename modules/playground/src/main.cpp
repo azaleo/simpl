@@ -6,6 +6,8 @@
 #include <simplay/platform/hittable.h>
 #include <simplay/platform/material.h>
 #include <simplay/platform/random.h>
+#include <simplay/platform/ray.h>
+#include <simplay/platform/vec3.h>
 
 namespace sim {
   const f64 ASPECT_RATIO = 16.0 / 9.0;
@@ -35,14 +37,14 @@ namespace sim {
   }
   
   void write_color3(FILE* out, const Color3& c) {
-    // sqrt <=> gamma=2.0.
+    // sqrt for gamma correction (gamma=2.0).
     i32 ir = (i32)(256.0 * clamp(sqrt(c.x), 0.0, 0.999));
     i32 ig = (i32)(256.0 * clamp(sqrt(c.y), 0.0, 0.999));
     i32 ib = (i32)(256.0 * clamp(sqrt(c.z), 0.0, 0.999));
     fprintf(out, "%d %d %d\n", ir, ig, ib);
   }
 
-  void render(const Camera& camera, const Hittable& world) {
+  void render(const Camera& cam, const Hittable& world) {
     printf("P3\n%d %d\n255\n", IMG_W, IMG_H);
     for (i32 y = IMG_H-1; y > 0; --y) {
       fprintf(stderr, "\rRendering %.2f%%", (f64)(IMG_H-y) / (IMG_H-1) * 100.0);
@@ -52,7 +54,7 @@ namespace sim {
         for (i32 i = 0; i < PIXEL_SAMPLES; ++i) {
           f64 u = ((f64)x + random_f64()) / (IMG_W-1);
           f64 v = ((f64)y + random_f64()) / (IMG_H-1);
-          pixel += ray_color(camera.cast_ray(u, v), world, MAX_DEPTH);
+          pixel += ray_color(cam.cast_ray(u, v), world, MAX_DEPTH);
         }
         pixel /= PIXEL_SAMPLES;
         write_color3(stdout, pixel);
@@ -77,6 +79,11 @@ int main() {
   world.scene.push(Hittable::make_sphere(Point3(-1.0, 0.0, -1.0), -0.45, &left_mat));
   world.scene.push(Hittable::make_sphere(Point3(1.0, 0.0, -1.0), 0.5, &right_mat));
 
-  render(Camera(), world);
+  Vec3 lookfrom(-2.0, 2.0, 1.0);
+  Vec3 lookat(0.0, 0.0, -1.0);
+  Vec3 up(0.0, 1.0, 0.0);
+  Camera cam(lookfrom, lookat, up, 20.0, ASPECT_RATIO);
+
+  render(cam, world);
   world.scene.release();
 }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common.h"
 #include "ray.h"
 #include "vec3.h"
 
@@ -10,20 +11,24 @@ namespace sim {
     Vec3 horizontal;
     Vec3 vertical;
 
-    Camera() {
-      f64 aspect_ratio = 16.0 / 9.0;
-      f64 viewport_h = 2.0;
+    Camera(const Point3& lookfrom, const Point3& lookat, const Vec3& up, f64 fovy, f64 aspect_ratio) {
+      f64 theta = radians(fovy);
+      f64 h = tan(theta/2);
+      f64 viewport_h = 2.0*h;
       f64 viewport_w = viewport_h * aspect_ratio;
-      f64 focal_length = 1.0;
+
+      Vec3 w = normalize(lookfrom - lookat);
+      Vec3 u = normalize(cross(up, w));
+      Vec3 v = cross(w, u);
       
-      origin = Vec3(0.0, 0.0, 0.0);
-      horizontal = Vec3(viewport_w, 0.0, 0.0);
-      vertical = Vec3(0.0, viewport_h, 0.0);
-      lower_left = origin - horizontal/2 - vertical/2 - Vec3(0.0, 0.0, focal_length);
+      origin = lookfrom;
+      horizontal = viewport_w * u;
+      vertical = viewport_h * v;
+      lower_left = origin - horizontal/2 - vertical/2 - w;
     }
 
-    Ray cast_ray(f64 u, f64 v) const {
-      return Ray(origin, lower_left + u*horizontal + v*vertical - origin);
+    Ray cast_ray(f64 s, f64 t) const {
+      return Ray(origin, lower_left + s*horizontal + t*vertical - origin);
     }
   };
 }

@@ -2,8 +2,7 @@
 
 #include <math.h>
 
-#include "ray.h"
-#include "vec3.h"
+#include "core.h"
 
 #undef min
 #undef max
