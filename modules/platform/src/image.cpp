@@ -209,12 +209,12 @@ namespace sim {
     }
 
     void write_be(u32 value, FILE* out_file) {
-      u8 bits[4] = {};
-      bits[3] = (value >> 0) & 0xFF;
-      bits[2] = (value >> 8) & 0xFF;
-      bits[1] = (value >> 16) & 0xFF;
-      bits[0] = (value >> 24) & 0xFF;
-      fwrite(bits, sizeof(u8), 4, out_file);
+      u8 bytes[4] = {};
+      bytes[3] = (value >> 0) & 0xFF;
+      bytes[2] = (value >> 8) & 0xFF;
+      bytes[1] = (value >> 16) & 0xFF;
+      bytes[0] = (value >> 24) & 0xFF;
+      fwrite(bytes, sizeof(u8), 4, out_file);
     }
 
     void Chunk::write_to(FILE* out_file) const {
