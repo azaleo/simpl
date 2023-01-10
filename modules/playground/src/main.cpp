@@ -1,38 +1,37 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include <simplay/platform/camera.h>
 #include <simplay/platform/common.h>
 #include <simplay/platform/core.h>
 #include <simplay/platform/hittable.h>
+#include <simplay/platform/image.h>
 #include <simplay/platform/material.h>
 #include <simplay/platform/random.h>
 #include <simplay/platform/ray.h>
 #include <simplay/platform/vec3.h>
 
 namespace sim {
-  struct SceneMaterials {
-    Material ground;
-    Vector<Material> spheres;
-    Material big1;
-    Material big2;
-    Material big3;
-  };
-
   struct Scene {
     Hittable objects;
-    SceneMaterials mats;
+
+    Material ground_mat;
+    Material big1_mat;
+    Material big2_mat;
+    Material big3_mat;
+    Vector<Material> sphere_mats;
 
     void release() {
-      mats.spheres.release();
       objects.release();
+      sphere_mats.release();
     }
   };
 
   const f64 ASPECT_RATIO = 3.0 / 2.0;
-  const i32 IMG_W = 1200;
+  const i32 IMG_W = 600;
   const i32 IMG_H = (i32)(IMG_W / ASPECT_RATIO);
-  const i32 PIXEL_SAMPLES = 10;
-  const i32 MAX_DEPTH = 20;
+  const i32 PIXEL_SAMPLES = 1;
+  const i32 MAX_DEPTH = 2;
 
   void build_scene(Scene* world) {
     if (!world)
@@ -42,12 +41,12 @@ namespace sim {
     world->objects = Hittable::make_scene();
 
     // Ground.
-    world->mats.ground = Material::make_lambertian(Color3(0.5, 0.5, 0.5));
-    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, -1000.0, 0.0), 1000.0, &world->mats.ground));
+    world->ground_mat = Material::make_lambertian(Color3(0.5, 0.5, 0.5));
+    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, -1000.0, 0.0), 1000.0, &world->ground_mat));
 
     // Small spheres.
-    // We need to pre-allocate to prevent mat pointer invalidation.
-    world->mats.spheres.reserve(22 * 22);
+    // We need to pre-allocate to prevent material pointer invalidation.
+    world->sphere_mats.reserve(22 * 22);
     for (i32 a = -11; a < 11; ++a) {
       for (i32 b = -11; b < 11; ++b) {
         Point3 center((f64)a + 0.9*random_f64(), 0.2, (f64)b + 0.9*random_f64());
@@ -66,19 +65,19 @@ namespace sim {
             sphere_mat = Material::make_dielectric(1.5);
           }
 
-          world->mats.spheres.push(sphere_mat);
-          world->objects.scene.push(Hittable::make_sphere(center, 0.2, &world->mats.spheres.back()));
+          world->sphere_mats.push(sphere_mat);
+          world->objects.scene.push(Hittable::make_sphere(center, 0.2, &world->sphere_mats.back()));
         }
       }
     }
 
     // Big spheres.
-    world->mats.big1 = Material::make_dielectric(1.5);
-    world->mats.big2 = Material::make_lambertian(Color3(0.4, 0.2, 0.1));
-    world->mats.big3 = Material::make_metal(Color3(0.7, 0.6, 0.5), 0.0);
-    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, 1.0, 0.0), 1.0, &world->mats.big1));
-    world->objects.scene.push(Hittable::make_sphere(Point3(-4.0, 1.0, 0.0), 1.0, &world->mats.big2));
-    world->objects.scene.push(Hittable::make_sphere(Point3(4.0, 1.0, 0.0), 1.0, &world->mats.big3));
+    world->big1_mat = Material::make_dielectric(1.5);
+    world->big2_mat = Material::make_lambertian(Color3(0.4, 0.2, 0.1));
+    world->big3_mat = Material::make_metal(Color3(0.7, 0.6, 0.5), 0.0);
+    world->objects.scene.push(Hittable::make_sphere(Point3(0.0, 1.0, 0.0), 1.0, &world->big1_mat));
+    world->objects.scene.push(Hittable::make_sphere(Point3(-4.0, 1.0, 0.0), 1.0, &world->big2_mat));
+    world->objects.scene.push(Hittable::make_sphere(Point3(4.0, 1.0, 0.0), 1.0, &world->big3_mat));
   }
 
   Camera make_camera() {
@@ -119,11 +118,15 @@ namespace sim {
     fprintf(out, "%d %d %d\n", ir, ig, ib);
   }
 
-  void render(const Camera& cam, const Hittable& world) {
+  FloatImage render(const Camera& cam, const Hittable& world) {
+    FloatImage result;
+    result.init(IMG_W, IMG_H);
+
     printf("P3\n%d %d\n255\n", IMG_W, IMG_H);
     for (i32 y = IMG_H-1; y > 0; --y) {
       fprintf(stderr, "\rRendering %.2f%%", (f64)(IMG_H-y) / (IMG_H-1) * 100.0);
       fflush(stderr);
+
       for (i32 x = 0; x < IMG_W; ++x) {
         Color3 pixel(0.0, 0.0, 0.0);
         for (i32 i = 0; i < PIXEL_SAMPLES; ++i) {
@@ -132,10 +135,13 @@ namespace sim {
           pixel += ray_color(cam.cast_ray(u, v), world, MAX_DEPTH);
         }
         pixel /= PIXEL_SAMPLES;
+
+        result.get(x, y) = pixel;
         write_color3(stdout, pixel);
       }
     }
     fprintf(stderr, "\n");
+    return result;
   }
 }
 
@@ -145,6 +151,9 @@ int main() {
   Scene world;
   build_scene(&world);
 
-  render(make_camera(), world.objects);
+  FloatImage result = render(make_camera(), world.objects);
   world.release();
+
+  result.save_png_to("out/result.png");
+  result.release();
 }

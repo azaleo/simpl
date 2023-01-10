@@ -51,7 +51,7 @@ namespace sim {
     // Returns a reference to the element that was just added.
     void push(const T& t) {
       if (length == capacity)
-        reserve(capacity * 2 + 1);
+        reserve((usize)((f64)capacity * 1.5) + 1);
       
       data[length++] = t;
     }
