@@ -57,7 +57,7 @@ namespace sim {
 
       Chunk() : length(0), type() {}
 
-      static Chunk make_IHDR(const IhdrChunkData& data) {
+      static Chunk make_ihdr(const IhdrChunkData& data) {
         Chunk res;
         res.length = 13*sizeof(u8);
         res.type = IHDR;
@@ -65,13 +65,13 @@ namespace sim {
         return res;
       }
 
-      static Chunk make_IEND() {
+      static Chunk make_iend() {
         Chunk res;
         res.type = IEND;
         return res;
       }
 
-      static Chunk make_IDAT() {
+      static Chunk make_idat() {
         Chunk res;
         res.type = IDAT;
         res.idat_data = nullptr;
@@ -105,10 +105,10 @@ namespace sim {
     ihdr_data.compression_method = 0;
     ihdr_data.filter_method = 0;
     ihdr_data.interlace_method = 0; // No interlacing.
-    Chunk::make_IHDR(ihdr_data).write(out);
+    Chunk::make_ihdr(ihdr_data).write(out);
 
     // Single black pixel test.
-    Chunk idat = Chunk::make_IDAT();
+    Chunk idat = Chunk::make_idat();
     idat.length = 13;
     idat.idat_data = (u8*)malloc(idat.length*sizeof(u8));
     idat.idat_data[0] = 0x08;
@@ -127,7 +127,7 @@ namespace sim {
     idat.write(out);
     free(idat.idat_data);
     
-    Chunk::make_IEND().write(out);    
+    Chunk::make_iend().write(out);    
     fclose(out);
   }
 
@@ -179,9 +179,10 @@ namespace sim {
         case NONE:
         default:
           break;
-        case IHDR:
+        case IHDR: {
           checksum = ihdr.compute_checksum(checksum);
           break;
+        }
       }
       return checksum;
     }
@@ -202,12 +203,14 @@ namespace sim {
         case NONE:
         default:
           break;
-        case IHDR:
+        case IHDR: {
           ihdr.write(out);
           break;
-        case IDAT:
+        }
+        case IDAT: {
           fwrite(idat_data, sizeof(u8), length, out);
           break;
+        }
       }
     }
 
