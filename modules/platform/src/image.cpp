@@ -19,7 +19,6 @@ namespace sim {
   }
 
   namespace {
-#pragma pack(push, 1)
     struct IhdrChunkData {
       u32 width;
       u32 height;
@@ -34,16 +33,7 @@ namespace sim {
           , compression_method(0), filter_method(0), interlace_method(0) {}
       
       u32 compute_checksum(u32 init) const;
-      void write_to(FILE* out) const;
-    };
-#pragma pack(pop)
-
-    struct BufferSpan {
-      const u8* value;
-      usize size;
-
-      BufferSpan() : value(nullptr), size(0) {}
-      BufferSpan(const u8* value, usize size) : value(value), size(size) {}
+      void write(FILE* out) const;
     };
 
     constexpr u32 encode_chunk_type(const char *data) {
@@ -69,7 +59,7 @@ namespace sim {
 
       static Chunk make_IHDR(const IhdrChunkData& data) {
         Chunk res;
-        res.length = sizeof(IhdrChunkData);
+        res.length = 13*sizeof(u8);
         res.type = IHDR;
         res.ihdr = data;
         return res;
@@ -89,12 +79,12 @@ namespace sim {
       }
 
       u32 compute_checksum() const;
-      void write_to(FILE* out) const;
-      void write_data_to(FILE* out) const;
+      void write(FILE* out) const;
+      void write_data(FILE* out) const;
     };
   }
 
-  void FloatImage::save_png_to(const char* out_path) {
+  void FloatImage::save_png(const char* out_path) {
     if (!out_path)
       return;
     
@@ -115,8 +105,9 @@ namespace sim {
     ihdr_data.compression_method = 0;
     ihdr_data.filter_method = 0;
     ihdr_data.interlace_method = 0; // No interlacing.
-    Chunk::make_IHDR(ihdr_data).write_to(out);
+    Chunk::make_IHDR(ihdr_data).write(out);
 
+    // Single black pixel test.
     Chunk idat = Chunk::make_IDAT();
     idat.length = 13;
     idat.idat_data = (u8*)malloc(idat.length*sizeof(u8));
@@ -133,10 +124,10 @@ namespace sim {
     idat.idat_data[10] = 0x02;
     idat.idat_data[11] = 0x00;
     idat.idat_data[12] = 0x01;
-    idat.write_to(out);
+    idat.write(out);
     free(idat.idat_data);
     
-    Chunk::make_IEND().write_to(out);    
+    Chunk::make_IEND().write(out);    
     fclose(out);
   }
 
@@ -200,20 +191,20 @@ namespace sim {
       fwrite(make_be(value).bytes, sizeof(u8), 4, out);
     }
 
-    void Chunk::write_to(FILE* out) const {
+    void Chunk::write(FILE* out) const {
       write_be(length, out);
       write_be(type, out);
-      write_data_to(out);
+      write_data(out);
       write_be(compute_checksum(), out);
     }
 
-    void Chunk::write_data_to(FILE* out) const {
+    void Chunk::write_data(FILE* out) const {
       switch (type) {
         case NONE:
         default:
           break;
         case IHDR:
-          ihdr.write_to(out);
+          ihdr.write(out);
           break;
         case IDAT:
           fwrite(idat_data, sizeof(u8), length, out);
@@ -229,7 +220,7 @@ namespace sim {
       return checksum;
     }
 
-    void IhdrChunkData::write_to(FILE* out) const {
+    void IhdrChunkData::write(FILE* out) const {
       write_be(width, out);
       write_be(height, out);
       fwrite(&bit_depth, sizeof(u8), 5, out);

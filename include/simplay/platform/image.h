@@ -15,6 +15,6 @@ namespace sim {
     void init(u32 new_w, u32 new_h);
     void release();
 
-    void save_png_to(const char* out_path);
+    void save_png(const char* out_path);
   };
 }

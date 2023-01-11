@@ -154,6 +154,6 @@ int main() {
   FloatImage result = render(make_camera(), world.objects);
   world.release();
 
-  result.save_png_to("out/result.png");
+  result.save_png("out/result.png");
   result.release();
 }
