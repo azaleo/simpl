@@ -148,7 +148,6 @@ namespace sim {
       return be;
     }
 
-    // https://www.w3.org/TR/png/#D-CRCAppendix
     namespace crc {
       u32 crc32_table[256] = {};
       bool crc32_table_initialized = false;
